@@ -199,8 +199,8 @@ int main() {
     cout << "Desvio padrao: " << final_desvio << endl;
     
     cout << "\n--- Metricas de Tempo ---" << endl;
-    cout << "**Tempo Total:** " << tempo_total << " ms" << endl;
-    cout << "**Tempo de Criacao dos processos:** " << tempo_criacao << " ms" << endl;
+    cout << "Tempo Total:" << tempo_total << " ms" << endl;
+    cout << "Tempo de Criacao dos processos: " << tempo_criacao << " ms" << endl;
 
     return 0;
 }
