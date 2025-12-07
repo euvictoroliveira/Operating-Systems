@@ -1,3 +1,25 @@
+/*
+Nome do Programa:
+    atividade01.cpp
+
+Autores:
+    João Victor Oliveira, 20240008468
+    Kevin Gabriel Mangueira, 20240008000
+
+Descrição Geral:
+    Este programa demonstra a criação hierárquica de processos usando chamadas
+    fork(), formando uma estrutura de Pai → Filhos → Netos.
+    Cada processo neto executa um comando do shell por meio da função execl(),
+    permitindo rodar instruções como "ls", "pwd", "date" ou "whoami".
+
+Organização dos Processos:
+    - O processo pai P1 cria dois processos filhos (F1 e F2).
+    - Cada filho cria dois processos netos:
+         F1 → N1("ls")   e N2("pwd")
+         F2 → N3("date") e N4("whoami")
+    - Os filhos aguardam o término de seus respectivos netos.
+    - O pai aguarda o término de ambos os filhos.
+*/
 #include <iostream>
 #include <unistd.h>
 #include <sys/wait.h>
