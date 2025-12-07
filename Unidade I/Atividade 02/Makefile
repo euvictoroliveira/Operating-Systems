@@ -6,17 +6,19 @@ SRC = src
 BIN = bin
 
 # informa a rota dos arquivos fonte
-THREADS_SRC = $(SRC)/threads.cpp
-SINGLE_SRC  = $(SRC)/single-thread.cpp
-PROC_SRC    = $(SRC)/processos.cpp
+THREADS_SRC  = $(SRC)/threads.cpp
+SINGLE_SRC   = $(SRC)/single-thread.cpp
+PROC_SRC     = $(SRC)/processos.cpp
+SINGLE_PROC_SRC = $(SRC)/single-process.cpp
 
 # geração de executáveis(salvos em bin)
-THREADS_BIN = $(BIN)/threads
-SINGLE_BIN  = $(BIN)/single-thread
-PROC_BIN    = $(BIN)/processos
+THREADS_BIN  = $(BIN)/threads
+SINGLE_BIN   = $(BIN)/single-thread
+PROC_BIN     = $(BIN)/processos
+SINGLE_PROC_BIN = $(BIN)/single-process
 
 # Alvo padrão
-all: $(THREADS_BIN) $(SINGLE_BIN) $(PROC_BIN)
+all: $(THREADS_BIN) $(SINGLE_BIN) $(PROC_BIN) $(SINGLE_PROC_BIN)
 
 # Compila threads.cpp
 $(THREADS_BIN): $(THREADS_SRC)
@@ -29,6 +31,10 @@ $(SINGLE_BIN): $(SINGLE_SRC)
 
 # Compila processos.cpp
 $(PROC_BIN): $(PROC_SRC)
+	$(CXX) $(CXXFLAGS) $< -o $@
+
+# Compila single-process.cpp
+$(SINGLE_PROC_BIN): $(SINGLE_PROC_SRC)
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 # Limpeza
@@ -44,3 +50,6 @@ run-single:
 
 run-processos:
 	./$(BIN)/processos
+
+run-single-process:
+	./$(BIN)/single-process
