@@ -103,25 +103,24 @@ int main() {
     cout << "Exemplo de execucao com 3 processos (fork/pipe)" << endl;
 
     // 2. Configuração dos Pipes
-    // pipe_fds[0] = Read end (para o processo pai)
-    // pipe_fds[1] = Write end (para o processo filho)
     int pipe_fds[2]; 
     if (pipe(pipe_fds) == -1) {
         perror("pipe failed");
         return 1;
     }
 
-    // 3. Criação dos Processos
-    auto inicio = std::chrono::high_resolution_clock::now();
+    // 3. Criação dos Processos e Medição de Tempo
+    
+    // Início da Medição Total e da Criação
+    auto t_inicio_total = std::chrono::high_resolution_clock::now(); 
 
-    // Array para armazenar PIDs dos filhos
     pid_t pids[3];
     int num_processos = 3;
 
     // Processo 1: Média
     pids[0] = fork();
     if (pids[0] == 0) {
-        close(pipe_fds[0]); // Fecha o lado de leitura no filho
+        close(pipe_fds[0]);
         calc_media(pipe_fds[1]);
     } else if (pids[0] < 0) {
         perror("fork failed for media");
@@ -148,8 +147,11 @@ int main() {
         return 1;
     }
 
+    // Fim da Medição da Criação (após o último fork)
+    auto t_fim_criacao = std::chrono::high_resolution_clock::now(); 
+    
     // 4. Processo Pai: Leitura dos Resultados
-    close(pipe_fds[1]); // Fecha o lado de escrita no pai
+    close(pipe_fds[1]); 
 
     double final_media = 0.0;
     double final_mediana = 0.0;
@@ -160,9 +162,7 @@ int main() {
         int type;
         double value;
         
-        // Lê o tipo de resultado
         if (read(pipe_fds[0], &type, sizeof(int)) > 0) {
-            // Lê o valor
             if (read(pipe_fds[0], &value, sizeof(double)) > 0) {
                 switch (type) {
                     case MEDIA:
@@ -185,14 +185,22 @@ int main() {
         waitpid(pids[i], nullptr, 0); 
     }
 
-    auto fim = std::chrono::high_resolution_clock::now();
-    double tempo_exec = std::chrono::duration<double, std::milli>(fim - inicio).count();
+    // Fim da Medição Total
+    auto t_fim_total = std::chrono::high_resolution_clock::now();
+
+    // Cálculo dos Tempos
+    double tempo_criacao = std::chrono::duration<double, std::milli>(t_fim_criacao - t_inicio_total).count();
+    double tempo_total = std::chrono::duration<double, std::milli>(t_fim_total - t_inicio_total).count();
 
     // 6. Exibir Resultados
+    cout << "\n--- Resultados Estatisticos ---" << endl;
     cout << "Media: " << final_media << endl;
     cout << "Mediana: " << final_mediana << endl;
     cout << "Desvio padrao: " << final_desvio << endl;
-    cout << "Tempo total: " << tempo_exec << " ms" << endl;
+    
+    cout << "\n--- Metricas de Tempo ---" << endl;
+    cout << "**Tempo Total:** " << tempo_total << " ms" << endl;
+    cout << "**Tempo de Criacao dos processos:** " << tempo_criacao << " ms" << endl;
 
     return 0;
 }
