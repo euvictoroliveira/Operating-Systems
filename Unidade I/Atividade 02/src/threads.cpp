@@ -12,12 +12,11 @@ using std::endl;
 using std::vector;
 
 
-// Variávies globais(fiz isso pra tornar os cálculos mais práticos)
 double media = 0;
 double mediana = 0;
 double desvioPadrao = 0;
 
-// Declara a quantidade de entradas e um vector com de tamanho N
+// Vector com 10000 entradas
 const int nEntradas = 10000;
 vector<int> valores(nEntradas);
 
@@ -33,8 +32,8 @@ void calc_media(){
 
 // Função para cálculo de mediana
 void calc_mediana(){
-    vector<int> v = valores; // cria vector local como cópia do vector global
-    // ordenal em rol
+    vector<int> v = valores;
+
     sort(v.begin(), v.end());
 
     // realiza cálculo da mediana
@@ -47,7 +46,7 @@ void calc_mediana(){
 
 void calc_desvio(){
     double soma = 0;
-    // Percorre vector acumulando seus valores
+    // Percorre vector somando seus valores
     for(int i = 0; i < nEntradas; i++)
         soma += valores[i];
 
@@ -59,7 +58,7 @@ void calc_desvio(){
 
 }
 
-// main
+
 int main(){
     // Gera os valores de maneira aleatório
     std::random_device rd;

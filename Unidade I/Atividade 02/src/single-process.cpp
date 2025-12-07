@@ -13,7 +13,6 @@ using std::vector;
 const int nEntradas = 10000;
 vector<int> valores(nEntradas);
 
-// Definições de códigos (mantidas para compatibilidade/clareza)
 enum ResultType { MEDIA, MEDIANA, DESVIO_PADRAO };
 
 double calc_media() {
@@ -74,12 +73,12 @@ int main() {
 
     double tempo_total = std::chrono::duration<double, std::milli>(t_fim_total - t_inicio_total).count();
 
-    cout << "\n--- Resultados Estatisticos ---" << endl;
+    cout << "--- Resultados Estatisticos ---" << endl;
     cout << "Media: " << final_media << endl;
     cout << "Mediana: " << final_mediana << endl;
     cout << "Desvio padrao: " << final_desvio << endl;
 
-    cout << "\n--- Metricas de Tempo ---" << endl;
+    cout << "--- Metricas de Tempo ---" << endl;
     cout << "Tempo Total:" << tempo_total << " ms" << endl;
 
     return 0;

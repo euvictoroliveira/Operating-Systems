@@ -12,10 +12,10 @@ using std::endl;
 using std::vector;
 
 
-// Declara a quantidade de entradas e um vector com de tamanho N
+// Tamanho do vetor
 const int nEntradas = 10000;
 
-// main
+
 int main(){
     vector<int> valores(nEntradas);
 

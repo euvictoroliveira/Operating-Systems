@@ -4,24 +4,19 @@
 #include <algorithm>
 #include <chrono>
 #include <random>
-#include <unistd.h> // Para fork, pipe
-#include <sys/wait.h> // Para waitpid
+#include <unistd.h>
+#include <sys/wait.h>
 
 using std::cout;
 using std::endl;
 using std::vector;
 
-// Constante e Vetor Global (será copiado para cada processo)
 const int nEntradas = 10000;
 vector<int> valores(nEntradas);
 
-// Definições de códigos para facilitar a leitura dos pipes
 enum ResultType { MEDIA, MEDIANA, DESVIO_PADRAO };
 
-/**
- * @brief Função que executa o cálculo da Média no processo filho.
- * @param write_fd File Descriptor para escrever o resultado no pipe.
- */
+
 void calc_media(int write_fd) {
     long long soma = 0;
     for (int i = 0; i < nEntradas; i++) {
@@ -36,10 +31,7 @@ void calc_media(int write_fd) {
     _exit(0); // Termina o processo filho
 }
 
-/**
- * @brief Função que executa o cálculo da Mediana no processo filho.
- * @param write_fd File Descriptor para escrever o resultado no pipe.
- */
+
 void calc_mediana(int write_fd) {
     vector<int> v = valores; 
     std::sort(v.begin(), v.end());
@@ -60,30 +52,20 @@ void calc_mediana(int write_fd) {
     _exit(0);
 }
 
-/**
- * @brief Função que executa o cálculo do Desvio Padrão no processo filho.
- * 
- * **IMPORTANTE:** Para este cálculo ser correto e independente, o processo filho 
- * primeiro calcula a média (ou a recebe) para garantir que tenha o valor correto.
- * 
- * @param write_fd File Descriptor para escrever o resultado no pipe.
- */
+
 void calc_desvio_padrao(int write_fd) {
-    // 1. Recalcular a Média dentro deste processo (Garantir independência e correção)
     long long soma = 0;
     for (int i = 0; i < nEntradas; i++) {
         soma += valores[i];
     }
     double media = (double)soma / nEntradas;
 
-    // 2. Calcular o Desvio Padrão
     double soma_quad = 0.0;
     for (int i = 0; i < nEntradas; i++) {
         soma_quad += std::pow(valores[i] - media, 2);
     }
     double desvioPadrao = std::sqrt(soma_quad / nEntradas);
 
-    // Escreve o tipo de resultado e o valor no pipe
     int type = DESVIO_PADRAO;
     write(write_fd, &type, sizeof(int));
     write(write_fd, &desvioPadrao, sizeof(double));
@@ -91,7 +73,6 @@ void calc_desvio_padrao(int write_fd) {
 }
 
 int main() {
-    // 1. Geração de Dados (Apenas no processo pai)
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dist(0, 100); 
@@ -102,14 +83,11 @@ int main() {
 
     cout << "Exemplo de execucao com 3 processos (fork/pipe)" << endl;
 
-    // 2. Configuração dos Pipes
     int pipe_fds[2]; 
     if (pipe(pipe_fds) == -1) {
         perror("pipe failed");
         return 1;
     }
-
-    // 3. Criação dos Processos e Medição de Tempo
     
     // Início da Medição Total e da Criação
     auto t_inicio_total = std::chrono::high_resolution_clock::now(); 
@@ -150,15 +128,14 @@ int main() {
     // Fim da Medição da Criação (após o último fork)
     auto t_fim_criacao = std::chrono::high_resolution_clock::now(); 
     
-    // 4. Processo Pai: Leitura dos Resultados
     close(pipe_fds[1]); 
 
-    double final_media = 0.0;
-    double final_mediana = 0.0;
-    double final_desvio = 0.0;
+    double final_media = 0;
+    double final_mediana = 0;
+    double final_desvio = 0;
     
-    int results_received = 0;
-    while (results_received < num_processos) {
+    int valoresRecebidos = 0;
+    while (valoresRecebidos < num_processos) {
         int type;
         double value;
         
@@ -175,12 +152,11 @@ int main() {
                         final_desvio = value;
                         break;
                 }
-                results_received++;
+                valoresRecebidos++;
             }
         }
     }
     
-    // 5. Esperar todos os filhos terminarem
     for (int i = 0; i < num_processos; i++) {
         waitpid(pids[i], nullptr, 0); 
     }
@@ -192,13 +168,12 @@ int main() {
     double tempo_criacao = std::chrono::duration<double, std::milli>(t_fim_criacao - t_inicio_total).count();
     double tempo_total = std::chrono::duration<double, std::milli>(t_fim_total - t_inicio_total).count();
 
-    // 6. Exibir Resultados
-    cout << "\n--- Resultados Estatisticos ---" << endl;
+    cout << "--- Resultados Estatisticos ---" << endl;
     cout << "Media: " << final_media << endl;
     cout << "Mediana: " << final_mediana << endl;
     cout << "Desvio padrao: " << final_desvio << endl;
     
-    cout << "\n--- Metricas de Tempo ---" << endl;
+    cout << "--- Metricas de Tempo ---" << endl;
     cout << "Tempo Total:" << tempo_total << " ms" << endl;
     cout << "Tempo de Criacao dos processos: " << tempo_criacao << " ms" << endl;
 
