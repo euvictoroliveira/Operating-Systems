@@ -25,12 +25,10 @@ $(THREADS_BIN): $(THREADS_SRC)
 
 # Compila single-thread.cpp
 $(SINGLE_BIN): $(SINGLE_SRC)
-	@mkdir -p $(BIN)
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 # Compila processos.cpp
 $(PROC_BIN): $(PROC_SRC)
-	@mkdir -p $(BIN)
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 # Limpeza
